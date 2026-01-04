@@ -1,0 +1,33 @@
+{
+    "name": "chartloop/metautils",
+    "description": "Meta Utilization",
+    "type": "library",
+    "license": "BSD-3-Clause",
+    "version":"1.0.4",
+    "require": {
+        "php": "^8.2",
+        "jackiedo/dotenv-editor": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "Chartloop\\MetaUtils\\": "src/"
+        },
+        "files": [
+            "src/helper.php"
+        ]
+    },
+    "authors": [
+        {
+            "name": "chartloop"
+        }
+    ],
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Chartloop\\MetaUtils\\Providers\\ChartloopServiceProvider"
+            ]
+        }
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}
