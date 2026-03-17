@@ -1,7 +1,7 @@
 /node_modules
 /public/storage
 /storage/*
-/bootstrap/cache/*
+/bootstrap/cache/
 .env
 .env.*
 .phpunit.result.cache
