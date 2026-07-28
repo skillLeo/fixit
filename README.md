@@ -1,247 +1,124 @@
+# Fixit — On-Demand Home Services Platform
 
+**Fixit** is a full-stack, multi-vendor on-demand home services marketplace (an UrbanClap / Urban Company style platform) connecting **Customers**, **Service Providers**, **Servicemen**, and **Admins**. This repository contains the **Laravel backend, REST API, and admin dashboard** that power the platform's Customer and Provider mobile apps.
 
-# Fixit – On Demand Home Service App
-
-### UrbanClap Clone | Flutter UI Kit Template
-
-## 📱 Project Overview
-
-**Fixit** is a **Flutter-based UI Kit Template** designed for building **On-Demand Home Service applications**, similar to platforms like **UrbanClap, HouseJoy, and Zimmber**.
-
-> ⚠️ **Important Notice**
-> This is a **UI TEMPLATE ONLY**.
-> It does **NOT** include backend logic, APIs, authentication services, payment gateways, or database integration.
-
-The project provides **ready-to-use static UI screens** that help developers rapidly build and customize a professional on-demand service app for **Android and iOS** using **Flutter 3.x**.
+> Built for real-world production use — booking management, zone-based provider matching, wallets & commissions, and 15+ integrated payment gateways out of the box.
 
 ---
 
-## 🧩 Project Structure
+## Overview
 
-The Fixit package contains **two separate Flutter UI applications**:
+Fixit lets customers browse service categories, book verified professionals, schedule appointments, and pay online — while providers manage their services, accept bookings, assign servicemen, and track earnings. Everything is orchestrated through a modular Laravel backend with a full-featured admin panel for platform operators.
 
-### 1️⃣ Fixit User App (Customer Side)
-
-A customer-facing app for browsing services and booking professionals.
-
-### 2️⃣ Fixit Provider App (Service Provider Side)
-
-A provider-facing app for managing services, bookings, and earnings.
-
-Each app is built with **clean architecture**, modular widgets, and reusable components.
+**Core user roles:**
+- **Customer** — browses categories/services, books, pays, tracks status, leaves reviews
+- **Provider** — manages services & packages, accepts bookings, assigns servicemen, tracks income
+- **Serviceman** — handles assigned jobs, manages wallet & withdrawals
+- **Admin** — manages the entire platform via the dashboard (categories, zones, payments, commissions, users, settings)
 
 ---
 
-## 🚀 Key Highlights
+## Tech Stack
 
-* Built with **Flutter 3.x**
-* **Cross-platform** (Android & iOS)
-* **Static UI Kit** (No backend included)
-* Well-organized, reusable, and customizable code
-* Optimized for fast development and UI scalability
-* Supports **Light & Dark Mode**
-* RTL-ready (Right-to-Left languages)
+| Layer | Technology |
+|---|---|
+| Backend Framework | Laravel 12 (PHP 8.2) |
+| Modular Architecture | `nwidart/laravel-modules` |
+| Admin Panel UI | Blade, Bootstrap 5, Alpine.js, jQuery, DataTables |
+| Build Tooling | Vite |
+| Auth & API Tokens | Laravel Sanctum |
+| Roles & Permissions | Spatie `laravel-permission` |
+| Media Handling | Spatie `laravel-medialibrary` |
+| Activity Logging | Spatie `laravel-activitylog` |
+| Geo / Zones | `matanyadaev/laravel-eloquent-spatial` |
+| Push Notifications | Firebase (Kreait) |
+| SMS / OTP | Twilio, Nexmo (Vonage), Msg91, custom gateways |
+| Exports / Imports | Maatwebsite Excel, PhpSpreadsheet |
+| PDF Generation | barryvdh/laravel-dompdf |
+| Social Login | Laravel Socialite |
+| Mobile Clients | Flutter (separate Customer & Provider apps) |
 
----
+### Integrated Payment Gateways
+Each gateway ships as an independent, self-contained Laravel module (own routes, config, and provider) so it can be enabled/disabled per deployment from the admin settings:
 
-## 📦 Screens & UI Coverage
-
-* **30+ screens** per app (User & Provider)
-* Fully responsive layouts
-* Modern, minimal, and professional UI design
-* Designed for real-world on-demand service workflows
-
----
-
-## 🎯 Fixit User App – Features
-
-* Browse service categories
-* View service details
-* Book services
-* Service scheduling UI
-* Multi-language UI support
-* Multi-currency UI support
-* Light & Dark Mode
-* RTL (Right-to-Left) language support
-* Provider-based state management
-* Well-structured UI components
+Stripe · PayPal · RazorPay · Paystack · Flutterwave · Mollie · Iyzico · PhonePe · Midtrans · SSLCommerz · BKash · CCAvenue · Instamojo · Alphanet
 
 ---
 
-## 🧑‍💼 Fixit Provider App – Features
+## Architecture
 
-* Provider registration UI
-* Service & package creation screens
-* Assign bookings to servicemen
-* Booking acceptance UI
-* Income & statistics UI
-* Custom timeslot creation UI
-* Multi-language & multi-currency support
-* Light & Dark Mode
-* RTL support
-* Provider state management
+```
+fixit/
+├── app/
+│   ├── Http/Controllers/API/       # Mobile app REST API (Customer & Provider apps)
+│   ├── Http/Controllers/Backend/   # Admin dashboard controllers
+│   ├── Models/                     # Booking, Provider, Customer, Service, Wallet, etc.
+│   ├── Repositories/                # Repository pattern (Prettus L5)
+│   ├── Services/                    # Business logic
+│   └── Notifications/, SMS/         # Push & SMS delivery
+├── Modules/                        # Self-contained payment gateway modules
+│   ├── Stripe/ PayPal/ RazorPay/ ... (routes, config, providers per gateway)
+│   └── Firebase/ Twilio/ Coupon/ Subscription/
+├── routes/
+│   ├── api.php                     # Mobile app API routes
+│   ├── backend.php                 # Admin panel routes
+│   └── web.php
+└── resources/                      # Blade views for the admin dashboard
+```
 
----
-
-## 🌍 Localization & Internationalization
-
-* **Multi-language support**
-* **Multi-currency support**
-* RTL (Arabic, Hebrew, etc.)
-* Locale-based UI rendering
-
----
-
-## 🛠️ State Management
-
-* Uses **Provider** for state management
-* Clean separation of UI and state logic
-* Easy to integrate with backend services later
+### Request Flow
+1. **Customer app** hits `routes/api.php` (Sanctum-protected, localization middleware) to browse services, create bookings, and pay.
+2. **Booking lifecycle**: a request is created → matched to providers/servicemen within a geographic **zone** → provider accepts → status is tracked through `BookingStatusLog` → payment is captured via the selected gateway module → **commission** is calculated and split between the provider/serviceman wallet and the platform.
+3. **Admin panel** (`routes/backend.php`) gives operators full control: categories, zones, providers, bookings, payouts, coupons, subscriptions, notifications, and system settings — all through a Bootstrap/Alpine.js dashboard with DataTables-driven listings.
+4. **Notifications**: booking and status updates trigger Firebase push notifications and SMS/OTP via the configured gateway.
 
 ---
 
-## 🎨 UI & Custom Components
+## Key Features
 
-### Custom Integrations Included
-
-1. Radius Buttons
-2. Cards
-3. Snackbar
-4. Progress Bar
-5. Alert Dialogs
-6. Modal Sheets
-7. Loader
-8. Input Boxes
-9. Pull-to-Refresh
-10. Tabs
-11. Custom Range Slider
-12. Custom Charts
-13. Date Picker
-14. Time Picker
+- Zone-based provider/service discovery
+- Real-time booking status tracking with full audit log
+- Multi-gateway payments with pluggable module architecture
+- Provider & serviceman wallets, commission history, and withdrawal requests
+- Coupons & subscription plans
+- Role-based access control (Admin, Provider, Customer, Serviceman)
+- Multi-language & multi-currency support, RTL-ready
+- Firebase push notifications + SMS/OTP (Twilio, Nexmo, Msg91)
+- Reviews & ratings, favourites, custom offers & bidding
+- Excel import/export and PDF invoice generation
+- Companion Flutter apps for Customer and Provider, each with 30+ screens, light/dark mode, and localization
 
 ---
 
-## 🧱 Flutter Widgets Used
+## Getting Started
 
-* AppBar
-* Bottom Navigation Bar
-* TabBar
-* Custom Buttons
-* PopupMenuButton
-* TextFormField
-* Image Widgets (assets, network, cached)
-* ListView
-* Divider
-* ListTile
-* BottomSheet
-* Icons
-* Charts
-* Range Slider
-* Animations
-* Maps (UI-level only)
+```bash
+git clone https://github.com/skillLeo/fixit.git
+cd fixit
 
----
+composer install
+npm install
 
-## 🧹 Code Quality & Standards
+cp .env.example .env
+php artisan key:generate
 
-* Clean and readable codebase
-* Files, classes, variables, and methods are well-named
-* **Each file under 70 lines** (where possible)
-* Easy to understand, reuse, and customize
-* Proper folder and feature-based structure
-* Fully commented and documented UI logic
+# configure your database and payment/SMS/Firebase credentials in .env
+
+php artisan migrate --seed
+php artisan storage:link
+
+npm run dev      # compile frontend assets
+php artisan serve
+```
+
+Enable/configure payment gateways, SMS providers, and Firebase from the **Admin → Settings** panel after installation.
 
 ---
 
-## ⚙️ Technical Specifications
+## License
 
-| Attribute       | Details        |
-| --------------- | -------------- |
-| Framework       | Flutter        |
-| Flutter Version | 3.x            |
-| Language        | Dart           |
-| Platforms       | Android & iOS  |
-| Backend         | ❌ Not Included |
-| APIs            | ❌ Not Included |
-| Database        | ❌ Not Included |
+This project is proprietary and intended for client delivery / commercial licensing. Redistribution of the source code without authorization is not permitted.
 
----
+## Contact
 
-## 📂 Files Included
-
-* Dart source code
-* Flutter UI widgets
-* Assets (images, icons, placeholders)
-* Theme configuration
-* Localization files
-
----
-
-## 📜 License Information
-
-* **License Type:** Regular License (Envato)
-* Use for **one personal or client project**
-* End users **must not be charged**
-* Source code redistribution is **not allowed**
-
-For full license details, refer to Envato’s official license terms.
-
----
-
-## 🧑‍💻 Ideal Use Cases
-
-* MVP development for on-demand service apps
-* UI prototyping
-* Startup demo applications
-* Flutter learning & UI reference
-* Custom backend integration projects
-* Client UI delivery before API development
-
----
-
-## 🚫 What This Project Does NOT Include
-
-* Authentication logic
-* Backend APIs
-* Admin panel
-* Payment gateway integration
-* Real-time data handling
-* Firebase or server integration
-
----
-
-## 🔧 Customization & Extension
-
-You can:
-
-* Use individual screens or components
-* Integrate your own backend (Firebase, REST API, GraphQL, etc.)
-* Replace static data with live APIs
-* Extend UI logic for production use
-
----
-
-## 📅 Project Metadata
-
-* **Author:** PixelStrap
-* **Platform:** CodeCanyon (Envato Market)
-* **Created:** 2 years ago
-* **Last Updated:** 14 September 2025
-* **Category:** Flutter Mobile UI Kit
-* **Tags:**
-  `urbanclap clone`, `on-demand service`, `home services app`, `flutter ui kit`, `booking app`
-
----
-
-## 📞 Support
-
-For technical support, updates, or inquiries, please contact the author directly via **CodeCanyon / Envato profile**.
-
----
-
-## ⭐ Final Notes
-
-Fixit is a **time-saving, production-grade UI kit** designed to accelerate Flutter development for on-demand service platforms.
-It provides a **solid UI foundation** that developers can extend with their own backend and business logic.
-
-
+For inquiries about customization, deployment, or licensing, please reach out via GitHub.
